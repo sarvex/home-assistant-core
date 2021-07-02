@@ -347,7 +347,7 @@ def _drop_foreign_key_constraints(connection, engine, table, columns):
             )
 
 
-def _apply_update(engine, session, new_version, old_version):
+def _apply_update(engine, session, new_version, old_version):  # noqa: C901
     """Perform operations to bring schema up to date."""
     connection = session.connection()
     if new_version == 1:
@@ -466,6 +466,13 @@ def _apply_update(engine, session, new_version, old_version):
         # Order matters! Statistics has a relation with StatisticsMeta,
         # so statistics need to be deleted before meta,
         # and meta needs to be created before statistics.
+        if sqlalchemy.inspect(engine).has_table(
+            StatisticsMeta.__tablename__
+        ) and sqlalchemy.inspect(engine).has_table(Statistics.__tablename__):
+            # Drop in together if both are present.
+            Base.metadata.drop_all(
+                tables=[StatisticsMeta.__table__, Statistics.__table__]
+            )
         if sqlalchemy.inspect(engine).has_table(Statistics.__tablename__):
             Statistics.__table__.drop(engine)
         if sqlalchemy.inspect(engine).has_table(StatisticsMeta.__tablename__):
