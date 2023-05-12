@@ -34,10 +34,11 @@ async def async_setup_entry(
     entities: list[CoverEntity] = []
     if aircons := instance.coordinator.data.get("aircons"):
         for ac_key, ac_device in aircons.items():
-            for zone_key, zone in ac_device["zones"].items():
-                # Only add zone vent controls when zone in vent control mode.
-                if zone["type"] == 0:
-                    entities.append(AdvantageAirZoneVent(instance, ac_key, zone_key))
+            entities.extend(
+                AdvantageAirZoneVent(instance, ac_key, zone_key)
+                for zone_key, zone in ac_device["zones"].items()
+                if zone["type"] == 0
+            )
     if things := instance.coordinator.data.get("myThings"):
         for thing in things["things"].values():
             if thing["channelDipState"] in [1, 2]:  # 1 = "Blind", 2 = "Blind 2"

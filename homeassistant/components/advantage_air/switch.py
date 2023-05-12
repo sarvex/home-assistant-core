@@ -26,13 +26,17 @@ async def async_setup_entry(
 
     entities: list[SwitchEntity] = []
     if aircons := instance.coordinator.data.get("aircons"):
-        for ac_key, ac_device in aircons.items():
-            if ac_device["info"]["freshAirStatus"] != "none":
-                entities.append(AdvantageAirFreshAir(instance, ac_key))
+        entities.extend(
+            AdvantageAirFreshAir(instance, ac_key)
+            for ac_key, ac_device in aircons.items()
+            if ac_device["info"]["freshAirStatus"] != "none"
+        )
     if things := instance.coordinator.data.get("myThings"):
-        for thing in things["things"].values():
-            if thing["channelDipState"] == 8:  # 8 = Other relay
-                entities.append(AdvantageAirRelay(instance, thing))
+        entities.extend(
+            AdvantageAirRelay(instance, thing)
+            for thing in things["things"].values()
+            if thing["channelDipState"] == 8
+        )
     async_add_entities(entities)
 
 

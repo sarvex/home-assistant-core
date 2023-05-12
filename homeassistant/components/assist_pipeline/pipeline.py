@@ -553,10 +553,12 @@ class PipelineInput:
                     )
                     current_stage = PipelineStage.TTS
 
-                if self.run.end_stage != PipelineStage.INTENT:
-                    if current_stage == PipelineStage.TTS:
-                        assert tts_input is not None
-                        await self.run.text_to_speech(tts_input)
+                if (
+                    self.run.end_stage != PipelineStage.INTENT
+                    and current_stage == PipelineStage.TTS
+                ):
+                    assert tts_input is not None
+                    await self.run.text_to_speech(tts_input)
 
         except PipelineError as err:
             self.run.process_event(

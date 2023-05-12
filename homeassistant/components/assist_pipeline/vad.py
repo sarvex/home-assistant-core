@@ -101,19 +101,7 @@ class VoiceCommandSegmenter:
         if self._timeout_seconds_left <= 0:
             return False
 
-        if not self.in_command:
-            if is_speech:
-                self._reset_seconds_left = self.reset_seconds
-                self._speech_seconds_left -= self._seconds_per_chunk
-                if self._speech_seconds_left <= 0:
-                    # Inside voice command
-                    self.in_command = True
-            else:
-                # Reset if enough silence
-                self._reset_seconds_left -= self._seconds_per_chunk
-                if self._reset_seconds_left <= 0:
-                    self._speech_seconds_left = self.speech_seconds
-        else:
+        if self.in_command:
             if not is_speech:
                 self._reset_seconds_left = self.reset_seconds
                 self._silence_seconds_left -= self._seconds_per_chunk
@@ -125,4 +113,15 @@ class VoiceCommandSegmenter:
                 if self._reset_seconds_left <= 0:
                     self._silence_seconds_left = self.silence_seconds
 
+        elif is_speech:
+            self._reset_seconds_left = self.reset_seconds
+            self._speech_seconds_left -= self._seconds_per_chunk
+            if self._speech_seconds_left <= 0:
+                # Inside voice command
+                self.in_command = True
+        else:
+            # Reset if enough silence
+            self._reset_seconds_left -= self._seconds_per_chunk
+            if self._reset_seconds_left <= 0:
+                self._speech_seconds_left = self.speech_seconds
         return True
