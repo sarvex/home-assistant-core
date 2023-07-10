@@ -1614,7 +1614,7 @@ renault-api==0.1.13
 reolink-aio==0.5.13
 
 # homeassistant.components.python_script
-restrictedpython==6.0
+restrictedpython==6.1
 
 # homeassistant.components.rflink
 rflink==0.0.65
